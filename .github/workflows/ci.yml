@@ -1,41 +1,27 @@
 name: ci
-
 on:
-  push:
-    tags:
-      - "v*.*.*"
   workflow_dispatch:
 
 jobs:
-  docker:
-    runs-on: ubuntu-latest
+  docker-hub:
+    name: Release on Docker Hub
+    runs-on: ubuntu-20.04
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v3
-      -
-        name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          # don't set latest tag
-          flavor: |
-            latest=false
-          # list of Docker images to use as base name for tags
-          images: |
-            vsyshost/tron-shkeeper
-          # generate Docker tags based on the following events/attributes
-#           tags: |
-#             type=semver,pattern={{version}}
-      -
-        name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: Build and push
-        uses: docker/build-push-action@v4
-        with:
-          push: true
-          tags: latest
+    - uses: actions/checkout@v2
+    - uses: docker/setup-qemu-action@v2
+      with:
+        platforms: amd64
+    - uses: docker/setup-buildx-action@v2
+
+    - uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - uses: docker/build-push-action@v2
+      with:
+        context: .
+        platforms: linux/amd64
+        push: true
+        tags: |
+          shimuldn/tron-shkeeper:latest

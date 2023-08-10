@@ -24,4 +24,4 @@ jobs:
         platforms: linux/amd64
         push: true
         tags: |
-          shimuldn/tron-shkeeper:latest
+          drag0nflyer/tron-shkeeper:latest
